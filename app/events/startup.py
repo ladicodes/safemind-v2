@@ -1,6 +1,5 @@
 from app.db.base import init_db, engine
 from app.events.message_queue import message_queue
-from app.services.nlp_service import NLPService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,14 +31,8 @@ async def initialize_connection_manager():
         logger.error(f"Failed to initialize connection manager: {str(e)}")
 
 async def preload_nlp_model():
-    """Preload NLP keywords."""
-    try:
-        high_count = len(NLPService.HIGH_RISK_KEYWORDS)
-        medium_count = len(NLPService.MEDIUM_RISK_KEYWORDS)
-        total = high_count + medium_count
-        logger.info(f"NLP model loaded with {total} keywords ({high_count} high-risk, {medium_count} medium-risk)")
-    except Exception as e:
-        logger.error(f"Failed to preload NLP model: {str(e)}")
+    """Compatibility hook retained for the original startup module."""
+    logger.info("Keyword safety service is ready")
 
 async def shutdown_database():
     """Close database connections on shutdown."""

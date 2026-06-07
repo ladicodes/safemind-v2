@@ -1,8 +1,7 @@
 from functools import lru_cache
 
-from pydantic import AnyUrl, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -13,12 +12,6 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./safemind.db"
     
-    # Redis
-    REDIS_URL: str
-    
-    # RabbitMQ
-    RABBITMQ_URL: str
-    
     # JWT
     JWT_SECRET_KEY: str = Field(default="change-me-in-production")
     JWT_ALGORITHM: str = "HS256"
@@ -28,17 +21,15 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str | None = None
     GOOGLE_CLIENT_SECRET: str | None = None
     GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/auth/google/callback"
+
+    # Optional AI reflection provider. The app always has an offline fallback.
+    OPENAI_API_KEY: str | None = None
+    OPENAI_MODEL: str = "gpt-5-mini"
     
     # App settings
     APP_NAME: str = "SafeMind"
-    DEBUG: bool = False
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-
 
 @lru_cache
 def get_settings() -> Settings:

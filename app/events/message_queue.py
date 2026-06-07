@@ -16,9 +16,8 @@ class MessageQueue:
     async def initialize(self):
         """Initialize message queue."""
         try:
-            logger.info(f"Initializing message queue with RABBITMQ_URL: {settings.RABBITMQ_URL[:50]}...")
             self.is_initialized = True
-            logger.info("Message queue channels initialized: emergency, escalation, followup")
+            logger.info("In-memory message queue initialized")
         except Exception as e:
             logger.error(f"Failed to initialize message queue: {str(e)}")
             raise

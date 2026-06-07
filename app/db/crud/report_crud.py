@@ -16,7 +16,6 @@ class ReportCRUD:
                 location=report_in.location,
                 latitude=report_in.latitude,
                 longitude=report_in.longitude,
-                category=getattr(report_in, 'category', None),
                 is_critical=False,
                 status="pending"
             )

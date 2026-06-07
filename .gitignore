@@ -1,0 +1,14 @@
+.env
+.venv/
+venv/
+backend/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+test.db
+*.log
+.DS_Store
+rustup-init.exe
+vs_BuildTools.exe

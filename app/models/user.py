@@ -1,5 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
+
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
+from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class User(Base):
@@ -13,5 +15,13 @@ class User(Base):
     password_hash = Column(String, nullable=True)
     is_verified = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, default=datetime.utcnow, server_default=func.now())
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        server_default=func.now(),
+        onupdate=datetime.utcnow,
+    )
+
+    journals = relationship("Journal", back_populates="user", cascade="all, delete-orphan")
+    moods = relationship("MoodCheckIn", back_populates="user", cascade="all, delete-orphan")

@@ -17,7 +17,6 @@ class UserCRUD:
                 email=user_in.email,
                 name=user_in.name,
                 picture=user_in.picture,
-                google_id=user_in.google_id,
                 password_hash=password_hash,
                 is_verified=False,
                 is_active=True

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from datetime import datetime
 from typing import Optional
 
@@ -7,9 +7,16 @@ class UserBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     picture: Optional[str] = None
 
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("must not be blank")
+        return value
+
 class UserCreate(UserBase):
-    password: Optional[str] = Field(None, min_length=6)
-    google_id: Optional[str] = None
+    password: str = Field(..., min_length=8, max_length=128)
 
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
@@ -22,8 +29,7 @@ class UserResponse(UserBase):
     created_at: datetime
     updated_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UserListResponse(BaseModel):
     id: int
@@ -32,10 +38,15 @@ class UserListResponse(BaseModel):
     is_verified: bool
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=1, max_length=128)
+
+UserOut = UserResponse

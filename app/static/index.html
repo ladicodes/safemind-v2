@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SafeSpace - Your mindful companion</title>
+  <style>
+    :root {
+      --ink: #173f3a;
+      --muted: #66817d;
+      --green: #347b6d;
+      --green-dark: #245e54;
+      --mint: #dff1e8;
+      --mint-light: #f2faf6;
+      --cream: #fbfaf5;
+      --peach: #f6dfce;
+      --purple: #e8e1f3;
+      --white: #fff;
+      --danger: #a94d55;
+      --shadow: 0 16px 45px rgba(35, 89, 78, .09);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font: 15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(205, 235, 220, .55), transparent 28%),
+        var(--cream);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+    aside {
+      position: sticky; top: 0; height: 100vh; padding: 34px 22px;
+      background: rgba(255,255,255,.76); border-right: 1px solid #e5ece7;
+      backdrop-filter: blur(16px);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font: 700 22px Georgia, serif; margin: 0 10px 44px; }
+    .brand-mark {
+      width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px;
+      color: white; background: var(--green); box-shadow: 0 8px 20px rgba(52,123,109,.25);
+    }
+    nav { display: grid; gap: 7px; }
+    .nav-item {
+      width: 100%; border: 0; border-radius: 12px; padding: 11px 13px; display: flex;
+      align-items: center; gap: 12px; color: var(--muted); background: transparent; text-align: left;
+    }
+    .nav-item:hover, .nav-item.active { color: var(--green-dark); background: var(--mint); }
+    .nav-icon { width: 22px; text-align: center; font-size: 17px; }
+    .sidebar-note {
+      position: absolute; left: 22px; right: 22px; bottom: 28px; padding: 16px;
+      border-radius: 15px; background: var(--mint-light); color: var(--muted); font-size: 12px;
+    }
+    main { min-width: 0; }
+    header {
+      height: 82px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; border-bottom: 1px solid rgba(225,233,227,.8);
+    }
+    .eyebrow { color: var(--green); font-size: 12px; text-transform: uppercase; letter-spacing: .13em; font-weight: 700; }
+    h1, h2, h3 { margin-top: 0; font-family: Georgia, "Times New Roman", serif; font-weight: 500; }
+    h1 { margin-bottom: 6px; font-size: clamp(30px, 4vw, 46px); letter-spacing: -.03em; }
+    h2 { font-size: 27px; margin-bottom: 6px; }
+    h3 { font-size: 19px; margin-bottom: 8px; }
+    p { margin-top: 0; }
+    .avatar {
+      width: 41px; height: 41px; border-radius: 50%; display: grid; place-items: center;
+      color: white; background: var(--green); font-weight: 700;
+    }
+    .content { padding: 42px 5vw 70px; max-width: 1450px; margin: auto; }
+    .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+    .hero p { color: var(--muted); max-width: 580px; }
+    .btn {
+      border: 0; border-radius: 12px; padding: 11px 17px; background: var(--green); color: white;
+      font-weight: 650; box-shadow: 0 8px 20px rgba(52,123,109,.18);
+    }
+    .btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .btn.secondary { color: var(--green-dark); background: var(--mint); box-shadow: none; }
+    .btn.ghost { color: var(--green); background: transparent; border: 1px solid #cddfd7; box-shadow: none; }
+    .btn.danger { background: #f6e5e6; color: var(--danger); box-shadow: none; }
+    .grid { display: grid; gap: 20px; }
+    .stats { grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; }
+    .dashboard { grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr); }
+    .card {
+      padding: 24px; border: 1px solid rgba(221,232,224,.9); border-radius: 20px;
+      background: rgba(255,255,255,.88); box-shadow: var(--shadow);
+    }
+    .stat { position: relative; overflow: hidden; min-height: 142px; }
+    .stat:after {
+      content: ""; position: absolute; width: 95px; height: 95px; border-radius: 50%;
+      right: -22px; top: -25px; background: rgba(255,255,255,.45);
+    }
+    .stat:nth-child(1) { background: var(--mint); }
+    .stat:nth-child(2) { background: var(--peach); }
+    .stat:nth-child(3) { background: var(--purple); }
+    .stat-label { color: var(--muted); font-size: 13px; }
+    .stat-value { font: 500 35px Georgia, serif; margin: 8px 0 2px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .section-head h2, .section-head h3 { margin: 0; }
+    .journal-list, .resource-list, .mood-history { display: grid; gap: 12px; }
+    .journal {
+      padding: 17px 18px; border-radius: 15px; background: var(--mint-light); border: 1px solid #e1eee8;
+    }
+    .journal-top { display: flex; justify-content: space-between; gap: 16px; }
+    .journal h3 { margin-bottom: 4px; }
+    .journal p { color: var(--muted); margin-bottom: 10px; }
+    .meta { color: #78908c; font-size: 12px; display: flex; gap: 9px; align-items: center; }
+    .pill { padding: 3px 9px; border-radius: 99px; color: var(--green-dark); background: var(--mint); font-size: 11px; }
+    .journal-actions { display: flex; gap: 7px; }
+    .icon-btn { border: 0; color: var(--muted); background: transparent; padding: 5px; }
+    .checkin { text-align: center; background: linear-gradient(145deg, #fff, var(--mint-light)); }
+    .moods { display: flex; justify-content: center; gap: 9px; margin: 20px 0; flex-wrap: wrap; }
+    .mood-btn {
+      width: 57px; height: 63px; border: 1px solid transparent; border-radius: 15px; color: var(--muted);
+      background: white; display: grid; place-items: center; gap: 1px; font-size: 11px;
+    }
+    .mood-btn span { font-size: 25px; }
+    .mood-btn:hover, .mood-btn.selected { border-color: var(--green); background: var(--mint); color: var(--green-dark); transform: translateY(-2px); }
+    .quote {
+      padding: 25px; border-radius: 20px; color: white;
+      background: linear-gradient(135deg, #3f897a, #2d6c61);
+    }
+    .quote p { font: italic 20px/1.45 Georgia, serif; margin-bottom: 10px; }
+    .reflection-box {
+      min-height: 170px; padding: 22px; border-radius: 18px; background: var(--mint-light);
+      border-left: 4px solid var(--green);
+    }
+    .reflection-box.crisis { background: #fff1f1; border-color: var(--danger); }
+    .disclaimer { color: var(--muted); font-size: 11px; margin: 13px 0 0; }
+    .resource {
+      display: grid; grid-template-columns: 42px 1fr; gap: 14px; padding: 17px;
+      border-radius: 15px; background: white; border: 1px solid #e5ece8;
+    }
+    .resource-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--mint); }
+    .resource p { color: var(--muted); margin: 0; font-size: 13px; }
+    .resource h3 { margin: 0 0 3px; font-size: 16px; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
+    input, textarea, select {
+      width: 100%; padding: 11px 13px; border: 1px solid #d8e3dd; border-radius: 11px;
+      outline: 0; background: white; color: var(--ink);
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(52,123,109,.1); }
+    textarea { min-height: 130px; resize: vertical; }
+    .form { display: grid; gap: 15px; }
+    dialog { width: min(560px, calc(100% - 30px)); border: 0; border-radius: 22px; padding: 0; box-shadow: 0 30px 90px rgba(25,60,53,.24); }
+    dialog::backdrop { background: rgba(22,51,46,.38); backdrop-filter: blur(4px); }
+    .modal { padding: 27px; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-head h2 { margin: 0; }
+    .close { border: 0; background: transparent; font-size: 24px; color: var(--muted); }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 5px; }
+    .login-screen {
+      min-height: 100vh; display: grid; place-items: center; padding: 25px;
+      background: radial-gradient(circle at 20% 10%, #d9eee4, transparent 35%), var(--cream);
+    }
+    .login-card { width: min(430px, 100%); padding: 40px; text-align: center; }
+    .login-card .brand { justify-content: center; margin: 0 0 30px; }
+    .demo-credentials { padding: 12px; border-radius: 12px; background: var(--mint-light); color: var(--muted); font-size: 12px; margin: 18px 0; }
+    .toast {
+      position: fixed; right: 24px; bottom: 24px; z-index: 20; max-width: 360px; padding: 13px 18px;
+      border-radius: 12px; background: var(--ink); color: white; box-shadow: var(--shadow);
+      animation: toast-in .25s ease;
+    }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
+    .empty { padding: 25px; text-align: center; color: var(--muted); border: 1px dashed #ceddd6; border-radius: 14px; }
+    .mobile-menu { display: none; border: 0; background: transparent; font-size: 24px; }
+    @media (max-width: 920px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { position: fixed; z-index: 15; left: -270px; width: 248px; transition: left .2s; box-shadow: var(--shadow); }
+      aside.open { left: 0; }
+      .mobile-menu { display: block; }
+      .stats, .dashboard { grid-template-columns: 1fr; }
+      .hero { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 560px) {
+      .content { padding: 28px 18px 55px; }
+      header { padding: 0 18px; }
+      .stats { grid-template-columns: 1fr; }
+      .card { padding: 19px; }
+    }
+  </style>
+</head>
+<body>
+  <section id="loginScreen" class="login-screen">
+    <div class="card login-card">
+      <div class="brand"><span class="brand-mark">S</span> SafeSpace</div>
+      <p class="eyebrow">Welcome back</p>
+      <h1>Your safe space to feel, reflect, and grow.</h1>
+      <p style="color:var(--muted)">A calm, private place for your thoughts and daily wellbeing.</p>
+      <div class="demo-credentials">Demo is ready to go. Just click below.<br><strong>demo@safespace.app</strong></div>
+      <button class="btn" style="width:100%" onclick="demoLogin()">Enter my SafeSpace</button>
+      <p id="loginError" class="disclaimer" style="color:var(--danger)"></p>
+    </div>
+  </section>
+
+  <div id="app" class="shell hidden">
+    <aside id="sidebar">
+      <div class="brand"><span class="brand-mark">S</span> SafeSpace</div>
+      <nav>
+        <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span> Home</button>
+        <button class="nav-item" data-view="journals"><span class="nav-icon">◇</span> My Journal</button>
+        <button class="nav-item" data-view="moods"><span class="nav-icon">◌</span> Mood Tracker</button>
+        <button class="nav-item" data-view="reflection"><span class="nav-icon">✦</span> AI Reflection</button>
+        <button class="nav-item" data-view="resources"><span class="nav-icon">♡</span> Resources</button>
+      </nav>
+      <div class="sidebar-note">SafeSpace supports reflection, not diagnosis. It is not a replacement for therapy or emergency care.</div>
+    </aside>
+
+    <main>
+      <header>
+        <button class="mobile-menu" onclick="toggleMenu()">☰</button>
+        <div><span class="eyebrow">Private · Supportive · Yours</span></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span id="headerName" style="color:var(--muted)"></span>
+          <div id="avatar" class="avatar">S</div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="view-home" class="view">
+          <div class="hero">
+            <div>
+              <p class="eyebrow">Sunday, your gentle reset</p>
+              <h1 id="greeting">Good morning, friend.</h1>
+              <p>Take a breath. You do not have to solve everything today. Start with how you feel right now.</p>
+            </div>
+            <button class="btn" onclick="openJournal()">+ Write a journal entry</button>
+          </div>
+
+          <div class="grid stats">
+            <div class="card stat"><div class="stat-label">Journal entries</div><div id="journalCount" class="stat-value">0</div><div class="meta">Your private reflection space</div></div>
+            <div class="card stat"><div class="stat-label">Mood check-ins</div><div id="moodCount" class="stat-value">0</div><div class="meta">Small moments of awareness</div></div>
+            <div class="card stat"><div class="stat-label">Most felt mood</div><div id="commonMood" class="stat-value">—</div><div id="moodTrend" class="meta">Not enough data</div></div>
+          </div>
+
+          <div class="grid dashboard">
+            <div class="card">
+              <div class="section-head"><h2>Recent reflections</h2><button class="btn ghost" onclick="showView('journals')">View all</button></div>
+              <div id="recentJournals" class="journal-list"></div>
+            </div>
+            <div class="grid">
+              <div class="card checkin">
+                <p class="eyebrow">Daily check-in</p>
+                <h2>How are you feeling?</h2>
+                <div class="moods compact-moods"></div>
+                <button class="btn secondary" onclick="showView('moods')">Add a check-in</button>
+              </div>
+              <div class="quote"><p>“Give yourself the same care and patience you freely offer others.”</p><small>Today’s gentle reminder</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-journals" class="view hidden">
+          <div class="hero"><div><p class="eyebrow">A private place for your thoughts</p><h1>My Journal</h1><p>Write honestly. There is no right way to feel.</p></div><button class="btn" onclick="openJournal()">+ New entry</button></div>
+          <div class="card"><div id="allJournals" class="journal-list"></div></div>
+        </section>
+
+        <section id="view-moods" class="view hidden">
+          <div class="hero"><div><p class="eyebrow">Notice without judgment</p><h1>Mood Tracker</h1><p>Small check-ins can help you notice patterns over time.</p></div></div>
+          <div class="grid dashboard">
+            <div class="card checkin">
+              <h2>How are you feeling right now?</h2>
+              <p style="color:var(--muted)">Choose the closest feeling, then tell us how strongly you feel it.</p>
+              <div id="moodPicker" class="moods"></div>
+              <form id="moodForm" class="form" onsubmit="saveMood(event)">
+                <label>Intensity: <strong id="intensityValue">6 / 10</strong><input id="moodIntensity" type="range" min="1" max="10" value="6" oninput="intensityValue.textContent=this.value+' / 10'"></label>
+                <label>A small note (optional)<textarea id="moodNote" placeholder="What is contributing to this feeling?"></textarea></label>
+                <button class="btn" type="submit">Save check-in</button>
+              </form>
+            </div>
+            <div class="card">
+              <div class="section-head"><h2>Recent check-ins</h2></div>
+              <div id="moodHistory" class="mood-history"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-reflection" class="view hidden">
+          <div class="hero"><div><p class="eyebrow">A thoughtful pause</p><h1>AI Reflection</h1><p>Receive a brief, supportive reflection based on one of your journal entries.</p></div></div>
+          <div class="grid dashboard">
+            <div class="card">
+              <h2>Choose a journal</h2>
+              <form class="form" onsubmit="generateReflection(event)">
+                <label>Journal entry<select id="reflectionJournal"></select></label>
+                <button class="btn" type="submit">✦ Reflect with me</button>
+                <button class="btn danger" type="button" onclick="createCrisisDemo()">Show crisis-safety demo</button>
+              </form>
+            </div>
+            <div class="card">
+              <p class="eyebrow">Your reflection</p>
+              <div id="reflectionResult" class="reflection-box">
+                <h3>A little space to think</h3>
+                <p style="color:var(--muted)">Choose an entry and SafeSpace will offer a gentle, non-diagnostic reflection.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-resources" class="view hidden">
+          <div class="hero"><div><p class="eyebrow">Support for the moment you are in</p><h1>Wellbeing Resources</h1><p>Simple practices for stress, anxiety, low moods, focus, and immediate safety.</p></div></div>
+          <div class="card"><div id="resourcesList" class="resource-list"></div><p id="resourceDisclaimer" class="disclaimer"></p></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="journalDialog">
+    <div class="modal">
+      <div class="modal-head"><h2 id="journalModalTitle">New journal entry</h2><button class="close" onclick="journalDialog.close()">×</button></div>
+      <form id="journalForm" class="form" onsubmit="saveJournal(event)">
+        <input id="journalId" type="hidden">
+        <label>Title<input id="journalTitle" required maxlength="200" placeholder="Give this moment a name"></label>
+        <label>How are you feeling?<select id="journalMood"><option value="">Choose a mood</option><option>calm</option><option>hopeful</option><option>grateful</option><option>anxious</option><option>overwhelmed</option><option>low</option></select></label>
+        <label>Your thoughts<textarea id="journalContent" required placeholder="Write whatever feels true right now..."></textarea></label>
+        <div class="form-actions"><button type="button" class="btn ghost" onclick="journalDialog.close()">Cancel</button><button class="btn" type="submit">Save privately</button></div>
+      </form>
+    </div>
+  </dialog>
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    const state = { token: localStorage.getItem("safespace_token"), user: null, journals: [], moods: [], summary: {}, selectedMood: "calm" };
+    const moodOptions = [
+      ["calm","😌"], ["hopeful","🌱"], ["grateful","✨"], ["anxious","😟"], ["overwhelmed","🌧️"], ["low","😔"]
+    ];
+    const resourceIcons = { stress:"◌", anxiety:"≈", "depression support":"♡", productivity:"✓", "emergency support":"!" };
+
+    async function api(path, options = {}) {
+      options.headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+      if (state.token) options.headers.Authorization = `Bearer ${state.token}`;
+      const response = await fetch(path, options);
+      if (response.status === 204) return null;
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "Something went wrong");
+      return data;
+    }
+    async function demoLogin() {
+      const error = document.getElementById("loginError");
+      error.textContent = "Opening your space...";
+      try {
+        const data = await api("/api/auth/login", { method:"POST", body:JSON.stringify({ email:"demo@safespace.app", password:"DemoPass123!" }) });
+        state.token = data.access_token; state.user = data.user;
+        localStorage.setItem("safespace_token", state.token);
+        await enterApp();
+      } catch (e) { error.textContent = e.message + ". Run: python -m app.seed"; }
+    }
+    async function enterApp() {
+      try {
+        state.user ||= await api("/api/auth/me");
+        loginScreen.classList.add("hidden"); app.classList.remove("hidden");
+        headerName.textContent = state.user.name; avatar.textContent = state.user.name.charAt(0).toUpperCase();
+        greeting.textContent = `${timeGreeting()}, ${state.user.name.split(" ")[0]}.`;
+        renderMoodButtons();
+        await Promise.all([loadJournals(), loadMoods(), loadResources()]);
+      } catch (_) {
+        localStorage.removeItem("safespace_token"); state.token = null;
+        loginScreen.classList.remove("hidden"); app.classList.add("hidden");
+      }
+    }
+    function timeGreeting() {
+      const hour = new Date().getHours();
+      return hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    }
+    async function loadJournals() {
+      state.journals = await api("/api/journals/");
+      journalCount.textContent = state.journals.length;
+      renderJournals(recentJournals, state.journals.slice(0, 3));
+      renderJournals(allJournals, state.journals);
+      reflectionJournal.innerHTML = state.journals.length
+        ? state.journals.map(j => `<option value="${j.id}">${escapeHtml(j.title)}</option>`).join("")
+        : `<option value="">Create a journal first</option>`;
+    }
+    function renderJournals(target, journals) {
+      target.innerHTML = journals.length ? journals.map(j => `
+        <article class="journal">
+          <div class="journal-top"><div><h3>${escapeHtml(j.title)}</h3><div class="meta"><span>${formatDate(j.created_at)}</span>${j.mood ? `<span class="pill">${escapeHtml(j.mood)}</span>` : ""}</div></div>
+          <div class="journal-actions"><button class="icon-btn" title="Edit" onclick="editJournal(${j.id})">✎</button><button class="icon-btn" title="Delete" onclick="deleteJournal(${j.id})">×</button></div></div>
+          <p>${escapeHtml(j.content.length > 180 ? j.content.slice(0,180)+"…" : j.content)}</p>
+        </article>`).join("") : `<div class="empty">Your first reflection can begin whenever you are ready.</div>`;
+    }
+    function openJournal() {
+      journalForm.reset(); journalId.value = ""; journalModalTitle.textContent = "New journal entry"; journalDialog.showModal();
+    }
+    function editJournal(id) {
+      const j = state.journals.find(x => x.id === id);
+      journalId.value = j.id; journalTitle.value = j.title; journalMood.value = j.mood || ""; journalContent.value = j.content;
+      journalModalTitle.textContent = "Edit journal entry"; journalDialog.showModal();
+    }
+    async function saveJournal(event) {
+      event.preventDefault();
+      const payload = { title:journalTitle.value, mood:journalMood.value || null, content:journalContent.value };
+      const id = journalId.value;
+      await api(id ? `/api/journals/${id}` : "/api/journals/", { method:id ? "PATCH" : "POST", body:JSON.stringify(payload) });
+      journalDialog.close(); await loadJournals(); toast(id ? "Journal updated" : "Journal saved privately");
+    }
+    async function deleteJournal(id) {
+      if (!confirm("Delete this journal entry?")) return;
+      await api(`/api/journals/${id}`, { method:"DELETE" }); await loadJournals(); toast("Journal deleted");
+    }
+    function renderMoodButtons() {
+      const html = moodOptions.map(([mood, icon]) => `<button type="button" class="mood-btn ${mood===state.selectedMood?"selected":""}" onclick="selectMood('${mood}')"><span>${icon}</span>${mood}</button>`).join("");
+      document.querySelectorAll(".compact-moods").forEach(el => el.innerHTML = html);
+      moodPicker.innerHTML = html;
+    }
+    function selectMood(mood) { state.selectedMood = mood; renderMoodButtons(); }
+    async function saveMood(event) {
+      event.preventDefault();
+      await api("/api/moods/", { method:"POST", body:JSON.stringify({ mood:state.selectedMood, intensity:Number(moodIntensity.value), note:moodNote.value || null }) });
+      moodNote.value = ""; await loadMoods(); toast("Mood check-in saved");
+    }
+    async function loadMoods() {
+      [state.moods, state.summary] = await Promise.all([api("/api/moods/"), api("/api/moods/summary")]);
+      moodCount.textContent = state.summary.total_check_ins;
+      commonMood.textContent = state.summary.most_common_mood || "—";
+      moodTrend.textContent = `Recent intensity trend: ${state.summary.recent_mood_trend}`;
+      moodHistory.innerHTML = state.moods.length ? state.moods.slice(0,6).map(m => `
+        <div class="resource"><div class="resource-icon">${(moodOptions.find(x=>x[0]===m.mood)||["","◌"])[1]}</div><div><h3>${escapeHtml(m.mood)} · ${m.intensity}/10</h3><p>${escapeHtml(m.note || "A quiet check-in.")}</p><div class="meta">${formatDate(m.created_at)}</div></div></div>`).join("") : `<div class="empty">No mood check-ins yet.</div>`;
+    }
+    async function generateReflection(event) {
+      event.preventDefault();
+      if (!reflectionJournal.value) return toast("Create a journal entry first");
+      reflectionResult.className = "reflection-box"; reflectionResult.innerHTML = "<p>Taking a thoughtful moment…</p>";
+      const result = await api("/api/reflections/", { method:"POST", body:JSON.stringify({ source_type:"journal", source_id:Number(reflectionJournal.value) }) });
+      showReflection(result);
+    }
+    function showReflection(result) {
+      reflectionResult.className = `reflection-box ${result.crisis_detected ? "crisis" : ""}`;
+      reflectionResult.innerHTML = `<h3>${result.crisis_detected ? "Your safety comes first" : "A gentle reflection"}</h3><p>${escapeHtml(result.reflection)}</p><p class="disclaimer">${escapeHtml(result.disclaimer)}</p>`;
+    }
+    async function createCrisisDemo() {
+      const created = await api("/api/journals/", { method:"POST", body:JSON.stringify({ title:"Safety demo entry", mood:"low", content:"This is fictional demo text: I want to hurt myself." }) });
+      await loadJournals();
+      const result = await api("/api/reflections/", { method:"POST", body:JSON.stringify({ source_type:"journal", source_id:created.id }) });
+      showReflection(result); toast("Crisis-safety response demonstrated");
+    }
+    async function loadResources() {
+      const data = await api("/api/resources/");
+      resourcesList.innerHTML = data.resources.map(r => `<article class="resource"><div class="resource-icon">${resourceIcons[r.category]||"♡"}</div><div><span class="eyebrow">${escapeHtml(r.category)}</span><h3>${escapeHtml(r.title)}</h3><p>${escapeHtml(r.description)}</p></div></article>`).join("");
+      resourceDisclaimer.textContent = data.disclaimer;
+    }
+    function showView(name) {
+      document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+      document.getElementById(`view-${name}`).classList.remove("hidden");
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.view === name));
+      sidebar.classList.remove("open"); window.scrollTo({top:0, behavior:"smooth"});
+    }
+    function toggleMenu() { sidebar.classList.toggle("open"); }
+    function toast(message) { const el=document.getElementById("toast"); el.textContent=message; el.classList.remove("hidden"); setTimeout(()=>el.classList.add("hidden"),2500); }
+    function escapeHtml(value="") { return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
+    function formatDate(value) { return new Date(value).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); }
+    document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("click", () => showView(item.dataset.view)));
+    if (state.token) enterApp();
+  </script>
+</body>
+</html>
