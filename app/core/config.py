@@ -1,7 +1,21 @@
+import os
+import tempfile
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def default_database_url() -> str:
+    if os.getenv("VERCEL"):
+        database_path = Path(tempfile.gettempdir()) / "safemind-vercel.db"
+        return f"sqlite:///{database_path.as_posix()}"
+    return "sqlite:///./safemind.db"
+
+
+def default_auto_seed() -> bool:
+    return bool(os.getenv("VERCEL"))
 
 
 class Settings(BaseSettings):
@@ -10,7 +24,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Database
-    DATABASE_URL: str = "sqlite:///./safemind.db"
+    DATABASE_URL: str = Field(default_factory=default_database_url)
+    AUTO_SEED_DEMO: bool = Field(default_factory=default_auto_seed)
     
     # JWT
     JWT_SECRET_KEY: str = Field(default="change-me-in-production")

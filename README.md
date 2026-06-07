@@ -34,6 +34,16 @@ Docker is also supported:
 docker compose up --build
 ```
 
+## Vercel Demo Deployment
+
+Vercel discovers the FastAPI application through `app/index.py`. No build
+command or output directory is required. Add `JWT_SECRET_KEY` in the Vercel
+project settings, then deploy the repository.
+
+For challenge demos, Vercel uses a temporary SQLite database and seeds the demo
+account on function startup. Temporary data can reset between function instances.
+Use a hosted PostgreSQL `DATABASE_URL` when durable production data is required.
+
 ## Environment Variables
 
 `DATABASE_URL`, `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_EXPIRATION_HOURS`,

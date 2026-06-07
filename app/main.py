@@ -26,6 +26,10 @@ FRONTEND_PATH = Path(__file__).parent / "static" / "index.html"
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
+    if settings.AUTO_SEED_DEMO:
+        from app.seed import seed_demo_data
+
+        seed_demo_data()
     logger.info("%s API started", settings.APP_NAME)
     yield
 
