@@ -36,8 +36,10 @@ docker compose up --build
 
 ## Vercel Demo Deployment
 
-Vercel discovers the FastAPI application through `app/index.py`. No build
-command or output directory is required. Add `JWT_SECRET_KEY` in the Vercel
+Vercel discovers the FastAPI application through `api/index.py`, and
+`vercel.json` rewrites all frontend and API requests to that function. No build
+command or output directory is required. The Vercel project **Root Directory**
+must be the repository root, not `backend/`. Add `JWT_SECRET_KEY` in the Vercel
 project settings, then deploy the repository.
 
 For challenge demos, Vercel uses a temporary SQLite database and seeds the demo
